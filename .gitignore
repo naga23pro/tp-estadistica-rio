@@ -1,0 +1,20 @@
+# Entorno virtual de Python (MUY IMPORTANTE: no subir a GitHub)
+venv/
+env/
+ENV/
+.venv/
+
+# Caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Archivos de sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Base de datos local (opcional: si quieres que el scraper la cree en el deploy)
+# rio.db

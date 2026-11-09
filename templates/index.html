@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Análisis Estadístico - Alturas Río Paraná (La Paz, Entre Ríos)</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --primary-light: #e0f2fe;
+      --accent: #0ea5e9;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 50px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #075985 0%, #0369a1 50%, #0284c7 100%);
+      color: white;
+      padding: 32px 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .header-content {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-titles h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-titles p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-white {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn {
+      cursor: pointer;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--primary-dark);
+    }
+    .btn-light:hover {
+      background: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    /* Loading and Alerts */
+    #loading-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .alert {
+      padding: 16px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      display: none;
+      font-size: 0.9rem;
+    }
+    .alert-error {
+      background-color: var(--danger-light);
+      color: #991b1b;
+      border: 1px solid #f87171;
+    }
+
+    /* Grid de KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .card.card-danger::before { background: var(--danger); }
+    .card.card-success::before { background: var(--success); }
+    .card.card-accent::before { background: var(--accent); }
+
+    .card-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .card-unit {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-left: 2px;
+    }
+
+    .card-subtext {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .kpi-tag {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .tag-danger { background: var(--danger-light); color: #991b1b; }
+    .tag-success { background: var(--success-light); color: #065f46; }
+    .tag-info { background: var(--primary-light); color: var(--primary-dark); }
+    .tag-warning { background: var(--warning-light); color: #92400e; }
+
+    /* Gráficos */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    /* Sistema de Alerta Temprana y Pronóstico en Tiempo Real */
+    .forecast-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .forecast-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .forecast-card {
+      background: var(--card-bg);
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .forecast-card.card-alerta {
+      border-left: 5px solid #f59e0b;
+    }
+
+    .forecast-card.card-evacuacion {
+      border-left: 5px solid #ef4444;
+    }
+
+    .forecast-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .forecast-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+
+    .badge-alerta {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-evacuacion {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+
+    .pulsing-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse-ring 1.4s ease-in-out infinite;
+    }
+
+    .dot-alerta { background: #d97706; }
+    .dot-evacuacion { background: #dc2626; }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.35); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.6; }
+    }
+
+    .forecast-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .forecast-timer {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 2.3rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      line-height: 1.1;
+    }
+
+    .card-alerta .forecast-timer {
+      color: #b45309;
+    }
+
+    .card-evacuacion .forecast-timer {
+      color: #dc2626;
+    }
+
+    .forecast-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #475569;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .forecast-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid var(--border);
+    }
+
+    .pill-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .btn-icon {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .btn-icon:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    /* Modal de Pantalla Completa Aislado */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(6px);
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .modal-dialog {
+      background: #ffffff;
+      width: 95vw;
+      max-width: 1540px;
+      height: 88vh;
+      border-radius: var(--radius);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 22px 26px;
+      animation: modalZoom 0.2s ease-out;
+      box-sizing: border-box;
+    }
+
+    @keyframes modalZoom {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+
+    .modal-body {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      height: calc(100% - 50px);
+      min-height: 0;
+    }
+
+    @media (max-width: 1024px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+
+    .chart-container {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      position: relative;
+      min-width: 0; /* Impide desborde del grid */
+      overflow: hidden;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      height: 340px;
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chart-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .chart-header span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      height: 340px;
+      width: 100%;
+    }
+
+    /* Detalles y Metodología */
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+    }
+
+    .detail-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .detail-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .detail-card p {
+      font-size: 0.88rem;
+      color: #334155;
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .formula-box {
+      background: #f1f5f9;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.85rem;
+      color: #0f172a;
+      margin: 10px 0;
+      border-left: 3px solid var(--primary);
+    }
+
+    footer {
+      max-width: 1280px;
+      margin: 40px auto 0;
+      padding: 16px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Encabezado Principal -->
+  <header>
+    <div class="header-content">
+      <div class="header-titles">
+        <div class="header-badges">
+          <span class="badge badge-white">Trabajo Práctico Universitario</span>
+          <span class="badge badge-white">Cátedra de Estadística</span>
+          <span class="badge badge-white">Prefectura Naval Argentina</span>
+        </div>
+        <h1 style="margin-top: 8px;">Monitor Hidrométrico: Puerto La Paz (Entre Ríos)</h1>
+        <p>Análisis de las alturas del Río Paraná bajo la influencia del fenómeno climático de <strong>El Niño</strong></p>
+      </div>
+      <div>
+        <button id="btn-recargar" class="btn btn-light" onclick="cargarDatos()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Actualizar Estadísticas
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Alertas y Estado de Carga -->
+    <div id="loading-state">
+      <div class="spinner"></div>
+      <h3>Consultando base de datos SQLite y calculando estadísticas...</h3>
+      <p style="color: var(--text-muted); margin-top: 6px;">Procesando modelos con SciPy y Statsmodels</p>
+    </div>
+
+    <div id="error-alert" class="alert alert-error">
+      <strong>Error al conectar con la API:</strong> <span id="error-message"></span>
+    </div>
+
+    <!-- Contenido del Dashboard (Oculto mientras carga) -->
+    <div id="dashboard-content" style="display: none;">
+      
+      <!-- Fila 1: Tarjetas de Resumen Estadístico (3 Paneles: Tendencia Central, Dispersión y Regresión) -->
+      <div class="kpi-grid">
+        
+        <!-- Tarjeta 1: Medidas de Tendencia Central -->
+        <div class="card">
+          <div class="card-label">
+            <span>Medidas de Tendencia Central</span>
+            <span>Localización</span>
+          </div>
+          <div class="card-value"><span id="kpi-media">--</span><span class="card-unit">m (Media)</span></div>
+          <div class="card-subtext">
+            Mediana (Q₂): <strong id="kpi-mediana">-- m</strong> | Moda: <strong id="kpi-moda">-- m</strong>
+          </div>
+          <div class="card-subtext" style="margin-top: 4px;">
+            Media Recortada (5%): <strong id="kpi-media-recortada">-- m</strong>
+          </div>
+          <div class="kpi-tag tag-info" id="kpi-cuartiles">Q₁: -- m | Q₃: -- m | IQR: -- m</div>
+        </div>
+
+        <!-- Tarjeta 2: Medidas de Dispersión y Variabilidad -->
+        <div class="card card-accent">
+          <div class="card-label">
+            <span>Dispersión y Variabilidad</span>
+            <span>Varianza y Desv.</span>
+          </div>
+          <div class="card-value"><span id="kpi-desv">--</span><span class="card-unit">m (s)</span></div>
+          <div class="card-subtext">
+            Varianza (s²): <strong id="kpi-varianza">-- m²</strong> | Coef. Variación (CV): <strong id="kpi-cv">--%</strong>
+          </div>
+          <div class="card-subtext" style="margin-top: 4px;">
+            Rango Total: <strong id="kpi-rango-total">-- m</strong> (Mín: <span id="kpi-min">--</span>m | Máx: <span id="kpi-max">--</span>m)
+          </div>
+          <div class="kpi-tag tag-warning" id="kpi-error-est">Error Estándar (SE): -- m</div>
+        </div>
+
+        <!-- Tarjeta 3: Regresión Lineal Autorregresiva AR(1) y Forma -->
+        <div class="card">
+          <div class="card-label">
+            <span>Modelo Lineal AR(1)</span>
+            <span>Inercia del Río</span>
+          </div>
+          <div class="card-value"><span id="kpi-r2">--</span><span class="card-unit">R²</span></div>
+          <div class="card-subtext">
+            Ecuación: <strong id="kpi-ecuacion">--</strong>
+          </div>
+          <div class="card-subtext" style="margin-top: 4px;">
+            Asimetría Fisher: <strong id="kpi-asimetria-val">--</strong> | Curtosis: <strong id="kpi-curtosis">--</strong>
+          </div>
+          <div class="kpi-tag tag-info">Correlación Pearson: <span id="kpi-pearson">--</span></div>
+        </div>
+
+      </div>
+
+      <!-- Fila 1.5: Sistema de Alerta Temprana y Contadores en Tiempo Real -->
+      <div class="forecast-grid">
+        
+        <!-- Contador 1: Tiempo transcurrido desde que superó Alerta (5.80 m) -->
+        <div class="forecast-card card-alerta">
+          <div class="forecast-header">
+            <div class="forecast-badge badge-alerta">
+              <span class="pulsing-dot dot-alerta"></span>
+              ESTADO DE ALERTA SUPERADO (5.80 m)
+            </div>
+            <span class="forecast-sub">Monitoreo Hidrométrico Activo</span>
+          </div>
+          <div class="forecast-timer" id="timer-alerta">00d 00h 00m 00s</div>
+          <div class="forecast-info">
+            <span id="texto-alerta-info">Superó el nivel de alerta oficial de 5.80 m.</span>
+            <span class="forecast-pill" id="pill-alerta-fecha">Cruce: 01/11/2026</span>
+          </div>
+        </div>
+
+        <!-- Contador 2: Pronóstico hacia Umbral de Evacuación (6.15 m) -->
+        <div class="forecast-card card-evacuacion">
+          <div class="forecast-header">
+            <div class="forecast-badge badge-evacuacion">
+              <span class="pulsing-dot dot-evacuacion"></span>
+              <span id="badge-evac-text">PRONÓSTICO: UMBRAL DE EVACUACIÓN (6.15 m)</span>
+            </div>
+            <span class="forecast-sub">Modelo Autorregresivo AR(1)</span>
+          </div>
+          <div class="forecast-timer" id="timer-evacuacion">00d 00h 00m 00s</div>
+          <div class="forecast-info">
+            <span id="texto-evacuacion-info">Tiempo estimado para alcanzar los 6.15 m.</span>
+            <span class="forecast-pill pill-danger" id="pill-evacuacion-dist">Faltan 15 cm (+3.0 cm/d)</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Fila 2: Gráficos Interactivos -->
+      <div class="charts-grid">
+        
+        <!-- Gráfico Cronológico (Series de Tiempo) -->
+        <div class="chart-container" id="container-chart-linea">
+          <div class="chart-header">
+            <div>
+              <h2>Evolución Diaria y Tendencia Secular (365 Días)</h2>
+              <span id="periodo-texto">Histórico de mediciones</span>
+            </div>
+            <div>
+              <button class="btn-icon" onclick="abrirModalGrafico()" title="Maximizar en pantalla completa">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                </svg>
+                <span>Maximizar</span>
+              </button>
+            </div>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="chart-linea"></canvas>
+          </div>
+        </div>
+
+        <!-- Histograma de Frecuencias -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <h2>Distribución de Frecuencias</h2>
+            <span>Histograma Anual</span>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="chart-histograma"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Fila 3: Análisis Detallado e Interpretaciones del Trabajo Práctico -->
+      <div class="details-grid">
+        
+        <!-- Interpretación Inferencial -->
+        <div class="detail-card">
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Inferencia Estadística (Prueba de Hipótesis Unilateral)
+          </h3>
+          <p>
+            Se formuló una prueba t de Student unilateral de cola derecha contrastando la media de los últimos 30 días contra la media histórica anual:
+          </p>
+          <div class="formula-box">
+            H₀: μ_reciente ≤ μ_histórica &nbsp;vs.&nbsp; H₁: μ_reciente > μ_histórica &nbsp;&nbsp;(α = 0.05, gl = 29)
+          </div>
+          <p style="font-size: 0.85rem; color: #475569; margin-bottom: 8px;">
+            <strong>Sospecha hidrológica:</strong> Se investiga si las precipitaciones anómalas de El Niño generaron que la media muestral reciente sea significativamente superior a la media histórica anual del río.
+          </p>
+          <p id="detalle-conclusion-inferencial" style="font-weight: 500;">
+            Cargando veredicto...
+          </p>
+        </div>
+
+        <!-- Interpretación de Regresión -->
+        <div class="detail-card">
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            Modelo Autorregresivo de Rezago 1: AR(1)
+          </h3>
+          <p>
+            Ajuste de regresión lineal simple prediciendo la altura del día actual en función de la lectura hidrométrica del día previo:
+          </p>
+          <div class="formula-box" id="detalle-formula-regresion">
+            Y(t) = β₁ · X(t-1) + β₀
+          </div>
+          <p id="detalle-interpretacion-regresion">
+            Cargando interpretación...
+          </p>
+        </div>
+
+        <!-- Impacto del Niño y Series Temporales -->
+        <div class="detail-card">
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+            </svg>
+            Impacto Hidrológico del Fenómeno de El Niño
+          </h3>
+          <p id="detalle-impacto-nino">
+            El fenómeno de El Niño (ENSO) incrementa el régimen pluviométrico en las nacientes de la cuenca del Plata. 
+            Prefectura Naval Argentina fija para el puerto de La Paz los niveles oficiales de <strong>Alerta (5.80 m)</strong> y <strong>Evacuación (6.15 m)</strong>. 
+            Durante la crecida extraordinaria analizada, el río superó el nivel de alerta alcanzando un pico de <strong>6.00 m</strong>.
+          </p>
+          <div class="formula-box">
+            Pico registrado: <span id="detalle-pico">-- m</span> | Estiaje: <span id="detalle-estiaje">-- m</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal de Pantalla Completa Aislado para el Gráfico -->
+  <div id="modal-grafico-max" class="modal-backdrop" onclick="handleBackdropClick(event)">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">Evolución Diaria y Tendencia Secular (365 Días) - Vista Completa</h2>
+          <span style="font-size: 0.85rem; color: #64748b;" id="periodo-modal">Historial Hidrométrico Puerto La Paz y Proyección de El Niño</span>
+        </div>
+        <button class="btn-icon" onclick="cerrarModalGrafico()" title="Cerrar (Esc)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          <span>Cerrar</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <canvas id="chart-linea-max"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Trabajo Práctico de Estadística Aplicada | Stack: Python (Flask, Pandas, SciPy, Statsmodels), SQLite y Chart.js</p>
+    <p style="margin-top: 4px;">Datos extraídos de Prefectura Naval Argentina (Puerto La Paz - ID 200)</p>
+  </footer>
+
+  <!-- Lógica JavaScript (Vanilla) -->
+  <script>
+    let chartLineaInstance = null;
+    let chartHistogramaInstance = null;
+    let chartMaxInstance = null;
+    let cachedLineData = null;
+    let contadorInterval = null;
+
+    async function cargarDatos() {
+      const loading = document.getElementById("loading-state");
+      const content = document.getElementById("dashboard-content");
+      const alertBox = document.getElementById("error-alert");
+      const alertMsg = document.getElementById("error-message");
+
+      loading.style.display = "block";
+      content.style.display = "none";
+      alertBox.style.display = "none";
+
+      try {
+        const response = await fetch("/api/datos");
+        if (!response.ok) {
+          throw new Error(`Error en el servidor HTTP (Código ${response.status})`);
+        }
+        const data = await response.json();
+        if (data.status !== "success") {
+          throw new Error(data.message || "Error procesando datos estadísticos.");
+        }
+
+        renderDashboard(data);
+        loading.style.display = "none";
+        content.style.display = "block";
+      } catch (err) {
+        loading.style.display = "none";
+        alertMsg.textContent = err.message;
+        alertBox.style.display = "block";
+      }
+    }
+
+    function renderDashboard(data) {
+      const desc = data.descriptiva;
+      const inf = data.inferencial;
+      const reg = data.regresion;
+      const st = data.series_tiempo;
+      const meta = data.metadata;
+
+      // 1. Tarjeta 1: Medidas de Tendencia Central
+      document.getElementById("kpi-media").textContent = desc.media.toFixed(2);
+      document.getElementById("kpi-mediana").textContent = `${desc.mediana.toFixed(2)} m`;
+      document.getElementById("kpi-moda").textContent = `${desc.moda.toFixed(2)} m`;
+      document.getElementById("kpi-media-recortada").textContent = `${desc.media_recortada_5.toFixed(2)} m`;
+      document.getElementById("kpi-cuartiles").textContent = `Q₁: ${desc.q1.toFixed(2)} m | Q₃: ${desc.q3.toFixed(2)} m | IQR: ${desc.iqr.toFixed(2)} m`;
+
+      // 2. Tarjeta 2: Medidas de Dispersión y Varianza
+      document.getElementById("kpi-desv").textContent = desc.desviacion_estandar.toFixed(2);
+      document.getElementById("kpi-varianza").textContent = `${desc.varianza.toFixed(3)} m²`;
+      document.getElementById("kpi-cv").textContent = `${desc.coeficiente_variacion.toFixed(1)}%`;
+      document.getElementById("kpi-rango-total").textContent = `${desc.rango_total.toFixed(2)} m`;
+      document.getElementById("kpi-min").textContent = desc.minimo.toFixed(2);
+      document.getElementById("kpi-max").textContent = desc.maximo.toFixed(2);
+      document.getElementById("kpi-error-est").textContent = `Error Estándar (SE): ±${desc.error_estandar_media.toFixed(3)} m`;
+
+      // 3. Tarjeta 3: Regresión AR(1) y Forma
+      document.getElementById("kpi-r2").textContent = reg.r2.toFixed(3);
+      document.getElementById("kpi-ecuacion").textContent = reg.ecuacion;
+      document.getElementById("kpi-asimetria-val").textContent = `${desc.coeficiente_asimetria.toFixed(3)}`;
+      document.getElementById("kpi-curtosis").textContent = `${desc.curtosis.toFixed(3)}`;
+      document.getElementById("kpi-pearson").textContent = reg.r_pearson.toFixed(4);
+
+      // 5. Detalles de texto explicativo
+      document.getElementById("detalle-conclusion-inferencial").textContent = inf.conclusion;
+      document.getElementById("detalle-formula-regresion").textContent = `${reg.ecuacion}  (R² = ${reg.r2.toFixed(4)})`;
+      document.getElementById("detalle-interpretacion-regresion").textContent = reg.interpretacion;
+      document.getElementById("detalle-pico").textContent = `${st.resumen.pico_maximo.altura} m (${st.resumen.pico_maximo.fecha})`;
+      document.getElementById("detalle-estiaje").textContent = `${st.resumen.estiaje_minimo.altura} m (${st.resumen.estiaje_minimo.fecha})`;
+      document.getElementById("periodo-texto").textContent = `Desde ${meta.fecha_inicio} hasta ${meta.fecha_fin} (${meta.total_registros} días)`;
+
+      // 6. Activar Contadores en Tiempo Real (Alerta Superada y Pronóstico de Evacuación)
+      if (data.pronostico) {
+        iniciarContadores(data.pronostico);
+      }
+
+      // 7. Renderizar Gráfico de Líneas (Series de Tiempo con Promedio Móvil, Umbrales y Proyección AR(1))
+      renderGraficoLinea(st, meta.umbral_alerta_m || 5.80, meta.umbral_evacuacion_m || 6.15, data.pronostico);
+
+      // 8. Renderizar Histograma de Frecuencias
+      renderGraficoHistograma(desc.histograma, desc.media);
+    }
+
+    function formatTiempo(segundosTotales) {
+      if (isNaN(segundosTotales) || segundosTotales < 0) return "00d 00h 00m 00s";
+      const d = Math.floor(segundosTotales / 86400);
+      const h = Math.floor((segundosTotales % 86400) / 3600);
+      const m = Math.floor((segundosTotales % 3600) / 60);
+      const s = Math.floor(segundosTotales % 60);
+      return `${String(d).padStart(2, '0')}d ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+    }
+
+    function iniciarContadores(pronostico) {
+      if (contadorInterval) {
+        clearInterval(contadorInterval);
+      }
+
+      const alerta = pronostico.alerta;
+      const evac = pronostico.evacuacion;
+
+      // Base temporal de referencia del cruce de alerta
+      const fechaCruceAlerta = new Date(alerta.fecha_cruce_iso || "2026-11-01T00:00:00");
+      // Fecha proyectada de llegada a evacuación
+      const fechaEstimadaEvac = new Date(evac.fecha_estimada_iso || "2026-11-11T12:00:00");
+
+      document.getElementById("texto-alerta-info").textContent = 
+        `Superó los ${alerta.umbral_m.toFixed(2)} m el ${alerta.fecha_cruce} (Lectura: ${alerta.altura_cruce} m).`;
+      document.getElementById("pill-alerta-fecha").textContent = `Cruce: ${alerta.fecha_cruce}`;
+
+      document.getElementById("texto-evacuacion-info").textContent = 
+        `Proyección AR(1): Impacto estimado el ${fechaEstimadaEvac.toLocaleDateString()} a las ${fechaEstimadaEvac.getHours()}:00 hs.`;
+      document.getElementById("pill-evacuacion-dist").textContent = 
+        `Faltan ${evac.distancia_cm} cm (+${evac.tasa_diaria_cm} cm/d)`;
+
+      function actualizarTicks() {
+        const ahora = new Date();
+
+        // 1. Contador Retrospectivo: tiempo transcurrido desde que superó 5.80 m
+        const diffAlertaSeg = Math.max(0, Math.floor((ahora - fechaCruceAlerta) / 1000));
+        document.getElementById("timer-alerta").textContent = formatTiempo(diffAlertaSeg);
+
+        // 2. Contador Regresivo / Prospectivo: tiempo restante para alcanzar 6.15 m
+        // Cuando llega a 0, empieza a contar hacia arriba el tiempo transcurrido en evacuación
+        const diffEvacSeg = Math.floor((fechaEstimadaEvac - ahora) / 1000);
+        if (diffEvacSeg > 0) {
+          document.getElementById("timer-evacuacion").textContent = formatTiempo(diffEvacSeg);
+          const badgeText = document.getElementById("badge-evac-text");
+          if (badgeText) badgeText.textContent = "PRONÓSTICO: UMBRAL DE EVACUACIÓN (6.15 m)";
+        } else {
+          // Ha llegado a 0 y cuenta hacia arriba el tiempo transcurrido
+          const segSuperado = Math.abs(diffEvacSeg);
+          document.getElementById("timer-evacuacion").textContent = "+" + formatTiempo(segSuperado);
+          const badgeText = document.getElementById("badge-evac-text");
+          if (badgeText) badgeText.textContent = "ESTADO DE EVACUACIÓN SUPERADO / ACTIVO";
+          document.getElementById("texto-evacuacion-info").textContent = 
+            `Tiempo transcurrido desde que se alcanzó el umbral crítico de evacuación (${fechaEstimadaEvac.toLocaleDateString()}).`;
+          document.getElementById("pill-evacuacion-dist").textContent = "Nivel Crítico Superado (+6.15 m)";
+        }
+      }
+
+      actualizarTicks();
+      contadorInterval = setInterval(actualizarTicks, 1000);
+    }
+
+    function renderGraficoLinea(st, umbralAlerta, umbralEvacuacion, pronostico) {
+      const ctx = document.getElementById("chart-linea").getContext("2d");
+      if (chartLineaInstance) {
+        chartLineaInstance.destroy();
+      }
+
+      // Las fechas corresponden estrictamente al historial analizado (sin desfase ni espacios vacíos al final)
+      const fechas = st.fechas;
+
+      // Líneas horizontales de referencia de Prefectura ajustadas con exactitud al rango de fechas reales
+      const lineaAlerta = new Array(fechas.length).fill(umbralAlerta);
+      const lineaEvacuacion = new Array(fechas.length).fill(umbralEvacuacion);
+
+      cachedLineData = {
+        labels: fechas,
+        datasets: [
+          {
+            label: "Altura Diaria Observada (m)",
+            data: st.alturas,
+            borderColor: "rgba(14, 165, 233, 0.5)",
+            backgroundColor: "rgba(14, 165, 233, 0.06)",
+            borderWidth: 1.5,
+            pointRadius: 0,
+            tension: 0.1,
+            fill: true
+          },
+          {
+            label: "Promedio Móvil 30 Días (Tendencia)",
+            data: st.media_movil_30,
+            borderColor: "#0369a1",
+            borderWidth: 2.8,
+            pointRadius: 0,
+            tension: 0.3,
+            fill: false
+          },
+          {
+            label: `Umbral de Alerta PNA (${umbralAlerta.toFixed(2)} m)`,
+            data: lineaAlerta,
+            borderColor: "#f59e0b",
+            borderWidth: 2,
+            borderDash: [6, 4],
+            pointRadius: 0,
+            fill: false
+          },
+          {
+            label: `Umbral de Evacuación PNA (${umbralEvacuacion.toFixed(2)} m)`,
+            data: lineaEvacuacion,
+            borderColor: "#ef4444",
+            borderWidth: 2,
+            borderDash: [4, 4],
+            pointRadius: 0,
+            fill: false
+          }
+        ]
+      };
+
+      chartLineaInstance = new Chart(ctx, {
+        type: "line",
+        data: cachedLineData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: "index",
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: "top",
+              labels: { boxWidth: 14, font: { size: 11 } }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  if (context.parsed.y === null || context.parsed.y === undefined) return "";
+                  return ` ${context.dataset.label}: ${context.parsed.y.toFixed(2)} m`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { maxTicksLimit: 14, font: { size: 10 } }
+            },
+            y: {
+              suggestedMin: 1.5,
+              suggestedMax: 6.5,
+              title: { display: true, text: "Nivel Hidrométrico (metros)", font: { size: 11 } },
+              grid: { color: "#f1f5f9" }
+            }
+          }
+        }
+      });
+    }
+
+    function renderGraficoHistograma(hist, media) {
+      const ctx = document.getElementById("chart-histograma").getContext("2d");
+      if (chartHistogramaInstance) {
+        chartHistogramaInstance.destroy();
+      }
+
+      chartHistogramaInstance = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: hist.bins_labels,
+          datasets: [
+            {
+              label: "Frecuencia de Días (Nº de observaciones)",
+              data: hist.frecuencias,
+              backgroundColor: "rgba(2, 132, 199, 0.7)",
+              borderColor: "#0284c7",
+              borderWidth: 1,
+              borderRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.parsed.y} días en este rango`
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { font: { size: 9 }, maxRotation: 45, minRotation: 30 },
+              grid: { display: false }
+            },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: "Cantidad de Días", font: { size: 10 } },
+              grid: { color: "#f1f5f9" }
+            }
+          }
+        }
+      });
+    }
+
+    function abrirModalGrafico() {
+      const modal = document.getElementById("modal-grafico-max");
+      modal.style.display = "flex";
+      document.body.style.overflow = "hidden";
+
+      if (chartMaxInstance) {
+        chartMaxInstance.destroy();
+      }
+
+      if (cachedLineData) {
+        const ctxModal = document.getElementById("chart-linea-max").getContext("2d");
+        chartMaxInstance = new Chart(ctxModal, {
+          type: "line",
+          data: cachedLineData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              mode: "index",
+              intersect: false
+            },
+            plugins: {
+              legend: {
+                position: "top",
+                labels: { boxWidth: 16, font: { size: 12, weight: "bold" } }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    if (context.parsed.y === null || context.parsed.y === undefined) return "";
+                    return ` ${context.dataset.label}: ${context.parsed.y.toFixed(2)} m`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { maxTicksLimit: 24, font: { size: 11 } }
+              },
+              y: {
+                suggestedMin: 1.5,
+                suggestedMax: 6.5,
+                title: { display: true, text: "Nivel Hidrométrico (metros)", font: { size: 13, weight: "bold" } },
+                grid: { color: "#f1f5f9" }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function cerrarModalGrafico() {
+      const modal = document.getElementById("modal-grafico-max");
+      modal.style.display = "none";
+      document.body.style.overflow = "";
+
+      if (chartMaxInstance) {
+        chartMaxInstance.destroy();
+        chartMaxInstance = null;
+      }
+    }
+
+    function handleBackdropClick(e) {
+      if (e.target.id === "modal-grafico-max") {
+        cerrarModalGrafico();
+      }
+    }
+
+    // Cerrar modal con la tecla Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        cerrarModalGrafico();
+      }
+    });
+
+    // Inicializar al cargar el DOM
+    document.addEventListener("DOMContentLoaded", cargarDatos);
+  </script>
+</body>
+</html>
