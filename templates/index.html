@@ -611,14 +611,14 @@
         <div class="card">
           <div class="card-label">
             <span>Medidas de Tendencia Central</span>
-            <span>Localización</span>
+            <span>Período: 06/08–06/11/2026 · n=93</span>
           </div>
-          <div class="card-value"><span id="kpi-media">--</span><span class="card-unit">m (Media)</span></div>
+          <div class="card-value"><span id="kpi-media">--</span><span class="card-unit">m (x̄ muestral)</span></div>
           <div class="card-subtext">
-            Mediana (Q₂): <strong id="kpi-mediana">-- m</strong> | Moda: <strong id="kpi-moda">-- m</strong>
+            Mediana (Me): <strong id="kpi-mediana">-- m</strong> | Media exacta (x̄): <strong id="kpi-media-recortada">-- m</strong>
           </div>
           <div class="card-subtext" style="margin-top: 4px;">
-            Media Recortada (5%): <strong id="kpi-media-recortada">-- m</strong>
+            Mín: <strong id="kpi-min-tc">-- m</strong> | Máx: <strong id="kpi-max-tc">-- m</strong> | Rango: <strong id="kpi-rango-tc">-- m</strong>
           </div>
           <div class="kpi-tag tag-info" id="kpi-cuartiles">Q₁: -- m | Q₃: -- m | IQR: -- m</div>
         </div>
@@ -627,7 +627,7 @@
         <div class="card card-accent">
           <div class="card-label">
             <span>Dispersión y Variabilidad</span>
-            <span>Varianza y Desv.</span>
+            <span>Varianza Muestral (s²)</span>
           </div>
           <div class="card-value"><span id="kpi-desv">--</span><span class="card-unit">m (s)</span></div>
           <div class="card-subtext">
@@ -639,20 +639,20 @@
           <div class="kpi-tag tag-warning" id="kpi-error-est">Error Estándar (SE): -- m</div>
         </div>
 
-        <!-- Tarjeta 3: Regresión Lineal Autorregresiva AR(1) y Forma -->
+        <!-- Tarjeta 3: Regresión Lineal La Paz ~ Goya y Forma -->
         <div class="card">
           <div class="card-label">
-            <span>Modelo Lineal AR(1)</span>
-            <span>Inercia del Río</span>
+            <span>Regresión Lineal (La Paz ~ Goya)</span>
+            <span>Pronóstico Hidrológico</span>
           </div>
           <div class="card-value"><span id="kpi-r2">--</span><span class="card-unit">R²</span></div>
           <div class="card-subtext">
-            Ecuación: <strong id="kpi-ecuacion">--</strong>
+            Ecuación MCO: <strong id="kpi-ecuacion">--</strong>
           </div>
           <div class="card-subtext" style="margin-top: 4px;">
             Asimetría Fisher: <strong id="kpi-asimetria-val">--</strong> | Curtosis: <strong id="kpi-curtosis">--</strong>
           </div>
-          <div class="kpi-tag tag-info">Correlación Pearson: <span id="kpi-pearson">--</span></div>
+          <div class="kpi-tag tag-info">Correlación Pearson (r): <span id="kpi-pearson">--</span></div>
         </div>
 
       </div>
@@ -683,7 +683,7 @@
               <span class="pulsing-dot dot-evacuacion"></span>
               <span id="badge-evac-text">PRONÓSTICO: UMBRAL DE EVACUACIÓN (6.15 m)</span>
             </div>
-            <span class="forecast-sub">Modelo Autorregresivo AR(1)</span>
+            <span class="forecast-sub">Tendencia Secular Lineal T = 4.2551 + 0.0143·Xc</span>
           </div>
           <div class="forecast-timer" id="timer-evacuacion">00d 00h 00m 00s</div>
           <div class="forecast-info">
@@ -701,7 +701,7 @@
         <div class="chart-container" id="container-chart-linea">
           <div class="chart-header">
             <div>
-              <h2>Evolución Diaria y Tendencia Secular (365 Días)</h2>
+              <h2>Evolución Diaria y Suavización PM₅ (Período de Estudio + Tiempo Real)</h2>
               <span id="periodo-texto">Histórico de mediciones</span>
             </div>
             <div>
@@ -744,16 +744,16 @@
               <line x1="16" y1="17" x2="8" y2="17"></line>
               <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
-            Inferencia Estadística (Prueba de Hipótesis Unilateral)
+            Inferencia Estadística — Prueba Z (Cola Derecha, n=93)
           </h3>
           <p>
-            Se formuló una prueba t de Student unilateral de cola derecha contrastando la media de los últimos 30 días contra la media histórica anual:
+            Prueba de hipótesis unilateral. Como n=93 &gt; 30 se aplica el Teorema Central del Límite (distribución Z normal estándar):
           </p>
           <div class="formula-box">
-            H₀: μ_reciente ≤ μ_histórica &nbsp;vs.&nbsp; H₁: μ_reciente > μ_histórica &nbsp;&nbsp;(α = 0.05, gl = 29)
+            H₀: µ ≤ 4.03 m &nbsp;vs.&nbsp; H₁: µ &gt; 4.03 m &nbsp;&nbsp;(α = 0.05, z_c = 1.645)
           </div>
           <p style="font-size: 0.85rem; color: #475569; margin-bottom: 8px;">
-            <strong>Sospecha hidrológica:</strong> Se investiga si las precipitaciones anómalas de El Niño generaron que la media muestral reciente sea significativamente superior a la media histórica anual del río.
+            <strong>Hipótesis:</strong> Se contrasta si la altura media de los 93 días de estudio (06/08–06/11/2026) supera significativamente la media histórica de referencia (µ₀ = 4.03 m), confirmando el impacto de El Niño. z_obs = 2.418 &gt; z_c = 1.645 → se rechaza H₀.
           </p>
           <p id="detalle-conclusion-inferencial" style="font-weight: 500;">
             Cargando veredicto...
@@ -768,13 +768,13 @@
               <line x1="12" y1="20" x2="12" y2="4"></line>
               <line x1="6" y1="20" x2="6" y2="14"></line>
             </svg>
-            Modelo Autorregresivo de Rezago 1: AR(1)
+            Regresión Lineal (MCO): La Paz ~ Goya
           </h3>
           <p>
-            Ajuste de regresión lineal simple prediciendo la altura del día actual en función de la lectura hidrométrica del día previo:
+            Regresión lineal simple por Mínimos Cuadrados Ordinarios. Variable explicativa X: altura en Goya (aguas arriba). Variable dependiente Y: altura en La Paz:
           </p>
           <div class="formula-box" id="detalle-formula-regresion">
-            Y(t) = β₁ · X(t-1) + β₀
+            ŷ = 0.9487 + 0.8156 · X_Goya &nbsp;(R² = 0.9566, r = 0.978)
           </div>
           <p id="detalle-interpretacion-regresion">
             Cargando interpretación...
@@ -793,12 +793,13 @@
               <line x1="1" y1="12" x2="3" y2="12"></line>
               <line x1="21" y1="12" x2="23" y2="12"></line>
             </svg>
-            Impacto Hidrológico del Fenómeno de El Niño
+            Series Cronológicas, Tendencia Secular y El Niño
           </h3>
           <p id="detalle-impacto-nino">
-            El fenómeno de El Niño (ENSO) incrementa el régimen pluviométrico en las nacientes de la cuenca del Plata. 
-            Prefectura Naval Argentina fija para el puerto de La Paz los niveles oficiales de <strong>Alerta (5.80 m)</strong> y <strong>Evacuación (6.15 m)</strong>. 
-            Durante la crecida extraordinaria analizada, el río superó el nivel de alerta alcanzando un pico de <strong>6.00 m</strong>.
+            Se aplicó suavización por <strong>Promedios Móviles de orden 5 (PM₅)</strong> (centrado, sin desfase temporal) para atenuar perturbaciones diarias.
+            La <strong>tendencia secular</strong> se estimó mediante regresión lineal con tiempo codificado: <strong>T = 4.2551 + 0.0143 · Xc</strong> (R² = 0.7393).
+            El <strong>pronóstico puntual para el Día 94 (07/11/2026)</strong> es de <strong>5.60 m</strong>, con un Intervalo de Confianza al 95% de <strong>[4.66 m ; 6.54 m]</strong> (margen de error ± 0.94 m).
+            En el río Paraná en La Paz, los niveles oficiales de PNA son <strong>Alerta: 5.80 m</strong> y <strong>Evacuación: 6.15 m</strong>.
           </p>
           <div class="formula-box">
             Pico registrado: <span id="detalle-pico">-- m</span> | Estiaje: <span id="detalle-estiaje">-- m</span>
@@ -815,7 +816,7 @@
     <div class="modal-dialog">
       <div class="modal-header">
         <div>
-          <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">Evolución Diaria y Tendencia Secular (365 Días) - Vista Completa</h2>
+          <h2>Evolución Diaria y Suavización PM₅ (Vista Completa)</h2>
           <span style="font-size: 0.85rem; color: #64748b;" id="periodo-modal">Historial Hidrométrico Puerto La Paz y Proyección de El Niño</span>
         </div>
         <button class="btn-icon" onclick="cerrarModalGrafico()" title="Cerrar (Esc)">
@@ -885,9 +886,15 @@
       // 1. Tarjeta 1: Medidas de Tendencia Central
       document.getElementById("kpi-media").textContent = desc.media.toFixed(2);
       document.getElementById("kpi-mediana").textContent = `${desc.mediana.toFixed(2)} m`;
-      document.getElementById("kpi-moda").textContent = `${desc.moda.toFixed(2)} m`;
-      document.getElementById("kpi-media-recortada").textContent = `${desc.media_recortada_5.toFixed(2)} m`;
-      document.getElementById("kpi-cuartiles").textContent = `Q₁: ${desc.q1.toFixed(2)} m | Q₃: ${desc.q3.toFixed(2)} m | IQR: ${desc.iqr.toFixed(2)} m`;
+      document.getElementById("kpi-media-recortada").textContent = `${desc.media.toFixed(4)} m`;
+      // Min/Max en tarjeta 1
+      const minTc = document.getElementById("kpi-min-tc");
+      if (minTc) minTc.textContent = `${desc.minimo.toFixed(2)} m`;
+      const maxTc = document.getElementById("kpi-max-tc");
+      if (maxTc) maxTc.textContent = `${desc.maximo.toFixed(2)} m`;
+      const rangoTc = document.getElementById("kpi-rango-tc");
+      if (rangoTc) rangoTc.textContent = `${desc.rango_total.toFixed(2)} m`;
+      document.getElementById("kpi-cuartiles").textContent = `Q₁: ${desc.q1.toFixed(4)} m | Q₃: ${desc.q3.toFixed(4)} m | IQR: ${desc.iqr.toFixed(4)} m`;
 
       // 2. Tarjeta 2: Medidas de Dispersión y Varianza
       document.getElementById("kpi-desv").textContent = desc.desviacion_estandar.toFixed(2);
@@ -898,20 +905,21 @@
       document.getElementById("kpi-max").textContent = desc.maximo.toFixed(2);
       document.getElementById("kpi-error-est").textContent = `Error Estándar (SE): ±${desc.error_estandar_media.toFixed(3)} m`;
 
-      // 3. Tarjeta 3: Regresión AR(1) y Forma
-      document.getElementById("kpi-r2").textContent = reg.r2.toFixed(3);
+      // 3. Tarjeta 3: Regresión La Paz ~ Goya y Forma
+      document.getElementById("kpi-r2").textContent = reg.r2.toFixed(4);
       document.getElementById("kpi-ecuacion").textContent = reg.ecuacion;
       document.getElementById("kpi-asimetria-val").textContent = `${desc.coeficiente_asimetria.toFixed(3)}`;
       document.getElementById("kpi-curtosis").textContent = `${desc.curtosis.toFixed(3)}`;
-      document.getElementById("kpi-pearson").textContent = reg.r_pearson.toFixed(4);
+      document.getElementById("kpi-pearson").textContent = reg.r_pearson.toFixed(3);
 
       // 5. Detalles de texto explicativo
       document.getElementById("detalle-conclusion-inferencial").textContent = inf.conclusion;
-      document.getElementById("detalle-formula-regresion").textContent = `${reg.ecuacion}  (R² = ${reg.r2.toFixed(4)})`;
+      document.getElementById("detalle-formula-regresion").textContent = `${reg.ecuacion}  (R² = ${reg.r2.toFixed(4)}, r = ${reg.r_pearson.toFixed(3)})`;
       document.getElementById("detalle-interpretacion-regresion").textContent = reg.interpretacion;
       document.getElementById("detalle-pico").textContent = `${st.resumen.pico_maximo.altura} m (${st.resumen.pico_maximo.fecha})`;
       document.getElementById("detalle-estiaje").textContent = `${st.resumen.estiaje_minimo.altura} m (${st.resumen.estiaje_minimo.fecha})`;
-      document.getElementById("periodo-texto").textContent = `Desde ${meta.fecha_inicio} hasta ${meta.fecha_fin} (${meta.total_registros} días)`;
+      // Período de estudio: 93 días fijos + datos en tiempo real para el gráfico
+      document.getElementById("periodo-texto").textContent = `Estudio: ${meta.periodo_estudio || "06/08/2026 – 06/11/2026"} (n=${meta.n_estudio || 93}) · Gráfico: hasta ${meta.fecha_fin} (${meta.total_registros} días)`;
 
       // 6. Activar Contadores en Tiempo Real (Alerta Superada y Pronóstico de Evacuación)
       if (data.pronostico) {
@@ -952,9 +960,9 @@
       document.getElementById("pill-alerta-fecha").textContent = `Cruce: ${alerta.fecha_cruce}`;
 
       document.getElementById("texto-evacuacion-info").textContent = 
-        `Proyección AR(1): Impacto estimado el ${fechaEstimadaEvac.toLocaleDateString()} a las ${fechaEstimadaEvac.getHours()}:00 hs.`;
+        `Proyección tendencia secular: Estimación al ${fechaEstimadaEvac.toLocaleDateString()} (± 0.94 m de margen).`;
       document.getElementById("pill-evacuacion-dist").textContent = 
-        `Faltan ${evac.distancia_cm} cm (+${evac.tasa_diaria_cm} cm/d)`;
+        `Faltan ${evac.distancia_cm} cm (Tendencia secular: +0.0286 m/día)`;
 
       function actualizarTicks() {
         const ahora = new Date();
@@ -1013,7 +1021,7 @@
             fill: true
           },
           {
-            label: "Promedio Móvil 30 Días (Tendencia)",
+            label: "Suavización PM₅ — Promedio Móvil centrado orden 5",
             data: st.media_movil_30,
             borderColor: "#0369a1",
             borderWidth: 2.8,

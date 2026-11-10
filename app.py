@@ -73,13 +73,17 @@ def api_datos():
             df_inicial = scraper.scrapear_alturas()
             scraper.guardar_en_sqlite(df_inicial)
 
+        # Período de estudio (informe): 06/08/2026 – 06/11/2026 (n=93)
+        df_estudio  = analisis.cargar_datos_desde_db(solo_estudio=True)
+        # Todos los datos para el gráfico (actualización en tiempo real)
+        df_completo = analisis.cargar_datos_desde_db(solo_estudio=False)
+
         # Ejecución de los 4 módulos estadísticos
-        df = analisis.cargar_datos_desde_db()
-        descriptiva = analisis.estadistica_descriptiva(df)
-        inferencial = analisis.estadistica_inferencial(df, alpha=0.05)
-        regresion = analisis.regresion_lineal_ar1(df)
-        series_tiempo = analisis.serie_temporal_tendencia(df, ventana=30)
-        pronostico = analisis.pronostico_umbrales(df, 5.80, 6.15)
+        descriptiva   = analisis.estadistica_descriptiva(df_estudio)
+        inferencial   = analisis.estadistica_inferencial(df_estudio, alpha=0.05)
+        regresion     = analisis.regresion_lineal_goya(df_estudio)
+        series_tiempo = analisis.serie_temporal_tendencia(df_completo)
+        pronostico    = analisis.pronostico_umbrales(df_completo, 5.80, 6.15)
 
         respuesta = {
             "status": "success",
@@ -87,9 +91,11 @@ def api_datos():
                 "puerto": "Puerto La Paz (Entre Ríos)",
                 "rio": "Río Paraná",
                 "fenomeno": "El Niño (ENSO)",
-                "total_registros": len(df),
-                "fecha_inicio": df["fecha"].min().strftime("%Y-%m-%d"),
-                "fecha_fin": df["fecha"].max().strftime("%Y-%m-%d"),
+                "periodo_estudio": "06/08/2026 – 06/11/2026",
+                "n_estudio": len(df_estudio),
+                "total_registros": len(df_completo),
+                "fecha_inicio": df_completo["fecha"].min().strftime("%Y-%m-%d"),
+                "fecha_fin": df_completo["fecha"].max().strftime("%Y-%m-%d"),
                 "umbral_alerta_m": 5.80,
                 "umbral_evacuacion_m": 6.15
             },
@@ -127,9 +133,9 @@ def api_actualizar():
 
 
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
     print("=" * 70)
     print(" INICIANDO SERVIDOR WEB FLASK - TP ESTADÍSTICA (LA PAZ)")
-    print(" Acceso local: http://127.0.0.1:5000")
-    print(" API Datos:    http://127.0.0.1:5000/api/datos")
+    print(f" Puerto activo: {port}")
     print("=" * 70)
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)
